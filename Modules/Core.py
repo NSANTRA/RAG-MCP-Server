@@ -190,3 +190,27 @@ def citationProvider(results: dict, answer: str) -> dict:
             "status": "error",
             "message": f"Error generating citations: {str(err)}"
         }
+    
+def listDocuments() -> dict:
+    """
+    Lists all documents stored in the DOCUMENT_DIR.
+
+    Args:
+        None
+
+    Returns:
+        dict: A dictionary containing:
+            - status (str): "success" or "error"
+            - documents (List[str]): List of document filenames
+    """
+    try:
+        documents = os.listdir(DOCUMENT_DIR)
+        return {
+            "status": "success",
+            "documents": documents
+        }
+    except Exception as err:
+        return {
+            "status": "error",
+            "message": f"Error listing documents: {str(err)}"
+        }
