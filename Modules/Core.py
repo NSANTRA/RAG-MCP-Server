@@ -1,148 +1,6 @@
 import os
-import requests
-from langchain_chroma import Chroma
-from Modules.Utils import saveFiles, rerankDocs
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from Modules.Config import CHROMA_DB_PERSIST_DIR, DOCUMENT_DIR, EMBEDDING_FUNCTION
-
-def embedPDF(filepath: str, file_url: str, filename: str, collection: str) -> dict:
-    """
-    Embeds the content of a PDF file (from local path or URL) into a Chroma vectorstore.
-
-    Args:
-        filepath (str, optional): Local path to the PDF file.
-        file_url (str, optional): Remote URL to the PDF file.
-        filename (str, optional): Name to assign to the saved file (used for MCP client).
-        collection (str): Target ChromaDB collection name.
-
-    Returns:
-        dict: A dictionary containing:
-            - status (str): "success" or "error"
-            - source (str): Original source (URL or local path)
-            - destination_filepath (str): Final saved file path used for embedding
-            - filename (str): File name used
-            - collection (str): Target ChromaDB collection name
-            - message (str): Summary of the operation
-    """
-    try:
-        if not filepath and not file_url:
-            raise ValueError("You must provide either 'filepath' or 'file_url'.")
-
-        if filename:
-            safe_filename = filename if filename.endswith(".pdf") else f"{filename}.pdf"
-        
-        elif file_url:
-            safe_filename = file_url.split("/")[-1] or "downloaded.pdf"
-        
-        else:
-            safe_filename = os.path.basename(filepath)
-
-        destination = os.path.join(DOCUMENT_DIR, safe_filename)
-
-        if file_url:
-            response = requests.get(file_url, stream=True)
-            if response.status_code != 200:
-                raise ValueError(f"Failed to download file from URL: {file_url}")
-
-            with open(destination, "wb") as f:
-                for chunk in response.iter_content(chunk_size = 8192):
-                    f.write(chunk)
-
-            filepath = destination
-
-        elif filepath:
-            destination = saveFiles(filepath, target_filename = safe_filename)
-
-        loader = PyPDFLoader(destination)
-        documents = loader.load()
-
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size = 1000,
-            chunk_overlap = 200
-        )
-        texts = text_splitter.split_documents(documents)
-
-        _ = Chroma.from_documents(
-            documents = texts,
-            embedding = EMBEDDING_FUNCTION,
-            collection_name = collection,
-            persist_directory = CHROMA_DB_PERSIST_DIR
-        )
-
-        return {
-            "status": "success",
-            "source": file_url if file_url else filepath,
-            "destination_filepath": destination,
-            "filename": safe_filename,
-            "collection": collection,
-            "message": f"PDF {safe_filename} has been successfully embedded and stored in collection '{collection}'.",
-        }
-
-    except Exception as err:
-        return {
-            "status": "error",
-            "message": f"Error embedding PDF: {str(err)}"
-        }
-    
-def retrieveDocs(query: str, collection: str, top_k: int = 20, use_reranker: bool = True) -> dict:
-    """
-    Retrieves relevant documents from a ChromaDB collection based on a user query.
-
-    Args:
-        query (str): The search query or prompt used to find relevant documents.
-        collection (str): Name of the ChromaDB collection to query.
-        top_k (int, optional): Number of top documents to retrieve. Defaults to 20.
-        use_reranker (bool, optional): Whether to rerank retrieved documents. Defaults to True.
-
-    Returns:
-        dict: A dictionary containing:
-            - status (str): "success" if documents are retrieved, otherwise "error".
-            - collection (str): Name of the queried collection.
-            - query (str): The input query used for retrieval.
-            - results (List[dict]): List of retrieved documents with:
-                - content (str): Text content of the document.
-                - metadata (dict): Metadata associated with the document.
-            - count (int): Number of documents returned.
-
-    On Error:
-        Returns a dictionary with:
-            - status (str): "error"
-            - message (str): Error details.
-    """
-    try:
-        db = Chroma(
-            embedding_function = EMBEDDING_FUNCTION,
-            collection_name = collection,
-            persist_directory = CHROMA_DB_PERSIST_DIR
-        ).as_retriever(kwargs = {"k": top_k})
-
-        results = db.invoke(query)
-
-        docs = [
-            {
-                "content": doc.page_content,
-                "metadata": doc.metadata,
-            }
-            for doc in results
-        ]
-
-        if use_reranker:
-            docs = rerankDocs(query, docs, top_k)
-
-        return {
-            "status": "success",
-            "collection": collection,
-            "query": query,
-            "results": docs,
-            "count": len(docs),
-        }
-
-    except Exception as err:
-        return {
-            "status": "error",
-            "message": f"Error retrieving documents: {str(err)}"
-        }
+from datetime import datetime
+from Modules.Config import DOCUMENT_DIR
 
 def citationProvider(results: dict, answer: str) -> dict:
     """
@@ -214,3 +72,68 @@ def listDocuments() -> dict:
             "status": "error",
             "message": f"Error listing documents: {str(err)}"
         }
+    
+def getDocumentMetadata(filename: str) -> dict:
+    """
+    Retrieves metadata for a specific document stored in DOCUMENT_DIR.
+
+    Args:
+        filename (str): Name of the document file.
+    
+    Returns:
+        dict: A dictionary containing:
+            - status (str): "success" or "error"
+            - filename (str): Name of the document file
+            - filepath (str): Full path to the document file
+            - size_bytes (int): Size of the file in bytes
+            - created (str): Creation timestamp
+            - modified (str): Last modified timestamp
+    """
+    try:
+        filepath = os.path.join(DOCUMENT_DIR, filename)
+        if not os.path.exists(filepath):
+            return {"status": "error", "message": f"{filename} not found."}
+
+        size = os.path.getsize(filepath)
+        created = datetime.fromtimestamp(os.path.getctime(filepath)).isoformat()
+        modified = datetime.fromtimestamp(os.path.getmtime(filepath)).isoformat()
+
+        return {
+            "status": "success",
+            "filename": filename,
+            "filepath": filepath,
+            "size_bytes": size,
+            "created": created,
+            "modified": modified,
+        }
+
+    except Exception as err:
+        return {"status": "error", "message": str(err)}
+    
+
+def updateDocument(filename: str, new_filename: str) -> dict:
+    """
+    Updates the filename of a document stored in DOCUMENT_DIR.
+
+    Args:
+        filename (str): Current name of the document file.
+        new_filename (str): New name to assign to the document file.
+
+    Returns:
+        dict: A dictionary containing:
+            - status (str): "success" or "error"
+            - message (str): Summary of the operation
+            - filepath (str): New file path after renaming
+    """
+    try:
+        old_path = os.path.join(DOCUMENT_DIR, filename)
+        if not os.path.exists(old_path):
+            return {"status": "error", "message": f"{filename} not found."}
+
+        new_path = os.path.join(DOCUMENT_DIR, new_filename)
+        os.rename(old_path, new_path)
+
+        return {"status": "success", "message": f"{filename} renamed to {new_filename}", "filepath": new_path}
+
+    except Exception as err:
+        return {"status": "error", "message": str(err)}
