@@ -3,7 +3,7 @@ import shutil
 from typing import List
 from Modules.Config import DOCUMENT_DIR, RERANKER
 
-def saveFiles(filepath: str) -> str:
+def saveFiles(filepath: str, target_filename: str) -> str:
     """
     Saves a file to the designated DOCUMENT_DIR.
 
@@ -14,12 +14,13 @@ def saveFiles(filepath: str) -> str:
         str: Destination path where the file is saved, or an error message.
     """
     try:
-        destination = f"{DOCUMENT_DIR}/{os.path.basename(filepath)}"
+        filename = target_filename or os.path.basename(filepath)
+        destination = os.path.join(DOCUMENT_DIR, filename)
         shutil.copy(filepath, destination)
         return destination
 
     except Exception as err:
-        return f"Error saving files"
+        return f"Error saving file: {str(err)}"
 
 def rerankDocs(query: str, results: list, top_k: int = 5) -> List:
     """
