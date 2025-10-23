@@ -32,6 +32,8 @@
     - Configuration Example
 - <a href = "#project-structure">Project Structure</a> -->
 
+<div align = "center">
+
 <a href = "#project-overview">
   <kbd> <br> Project Overview <br> </kbd>
 </a>&ensp;&ensp;
@@ -54,7 +56,9 @@
 
 <a href = "#project-structure">
   <kbd> <br> Project Structure <br> </kbd>
-</a>&ensp;&ensp;
+</a>
+
+</div>
 
 ---
 
