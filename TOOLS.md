@@ -70,7 +70,7 @@ _None_
 **Returns:**  
 - Dictionary containing the annotated answer with citations and metadata for each source.
 
-## 8. seacrhAcrossCollections
+## 8. searchAcrossCollections
 **Description:** Searches for relevant documents across multiple ChromaDB collections based on a query.
 
 **Arguments:**
