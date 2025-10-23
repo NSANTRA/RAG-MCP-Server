@@ -4,3 +4,5 @@ __pycache__/
 Databases/
 Documents/
 .gitattributes
+.env
+Code.txt
