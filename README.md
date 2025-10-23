@@ -36,23 +36,23 @@
 
 <a href = "#project-overview">
   <kbd> <br> Project Overview <br> </kbd>
-</a>&ensp;&ensp;
+</a>
 
 <a href = "#features">
   <kbd> <br> Features <br> </kbd>
-</a>&ensp;&ensp;
+</a>
 
 <a href = "TOOLS.md">
   <kbd> <br> Available Tools <br> </kbd>
-</a>&ensp;&ensp;
+</a>
 
 <a href = "#getting-started">
   <kbd> <br> Getting Started <br> </kbd>
-</a>&ensp;&ensp;
+</a>
 
 <a href = "#claude-integration">
   <kbd> <br> Claude Integration <br> </kbd>
-</a>&ensp;&ensp;
+</a>
 
 <a href = "#project-structure">
   <kbd> <br> Project Structure <br> </kbd>
