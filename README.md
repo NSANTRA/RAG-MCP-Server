@@ -31,6 +31,7 @@
 - <a href = "#claude-integration">Claude Integration</a>
     - Configuration Example
 - <a href = "#project-structure">Project Structure</a>
+- <a href = "#references">References</a>
 
 <!-- <div align = "center">
 
