@@ -22,17 +22,17 @@
 [![TOC](https://readme-typing-svg.herokuapp.com?font=JetBrainsMono+Nerd+Font&letterSpacing=0.3rem&duration=3000&pause=1000&color=00AEAE&width=450&lines=TABLE+OF+CONTENTS)]()
 
 <!-- - <a href = "TOOLS.md">Available Tools</a> -->
-<!-- - <a href = "#project-overview">Project Overview</a>
+- <a href = "#project-overview">Project Overview</a>
 - <a href = "#features">Features</a>
-- <a href = "#tools">Available Tools</a>
+- <a href = "TOOLS.md">Available Tools</a>
 - <a href = "#getting-started">Getting Started</a>
     - Prerequisites
     - Installation
 - <a href = "#claude-integration">Claude Integration</a>
     - Configuration Example
-- <a href = "#project-structure">Project Structure</a> -->
+- <a href = "#project-structure">Project Structure</a>
 
-<div align = "center">
+<!-- <div align = "center">
 
 <a href = "#project-overview">
   <kbd> <br> Project Overview <br> </kbd>
@@ -58,7 +58,7 @@
   <kbd> <br> Project Structure <br> </kbd>
 </a>
 
-</div>
+</div> -->
 
 ---
 
