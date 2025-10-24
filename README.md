@@ -24,12 +24,12 @@
 <!-- - <a href = "TOOLS.md">Available Tools</a> -->
 - <a href = "#project-overview">Project Overview</a>
 - <a href = "#features">Features</a>
-- <a href = "TOOLS.md">Available Tools</a>
 - <a href = "#getting-started">Getting Started</a>
     - Prerequisites
     - Installation
 - <a href = "#claude-integration">Claude Integration</a>
     - Configuration Example
+- <a href = "TOOLS.md">Available Tools</a>
 - <a href = "#project-structure">Project Structure</a>
 - <a href = "#references">References</a>
 

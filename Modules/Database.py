@@ -63,11 +63,11 @@ def deleteCollection(collection: str) -> dict:
 def embedPDF(filepath: str = None, file_url: str = None, filename: str = None, collection: str = None) -> dict:
     """
     Embeds the content of a PDF file (from local path or URL) into a Chroma vectorstore.
-    Claude Desktop decides whether to pass filepath or file_url based on the prompt.
+    Claude Desktop decides whether to pass filepath (local) or file_url (HTTPS url) based on the prompt.
     
     Args:
         filepath (str, optional): Local path to the PDF file.
-        file_url (str, optional): Remote URL to the PDF file.
+        file_url (str, optional): HTTPS URL to the PDF file.
         filename (str, optional): Name to assign to the saved file (used for MCP client).
         collection (str, optional): Target ChromaDB collection name.
     
@@ -81,63 +81,60 @@ def embedPDF(filepath: str = None, file_url: str = None, filename: str = None, c
             - message (str): Summary of the operation
     """
     try:
-        if not filepath and not file_url:
-            raise ValueError("You must provide either 'filepath' or 'file_url'.")
-
-        if filename:
-            safe_filename = filename if filename.endswith(".pdf") else f"{filename}.pdf"
+        destination = os.path.normpath(os.path.join(DOCUMENT_DIR, filename))
+        source = None
         
-        elif file_url:
-            safe_filename = file_url.split("/")[-1] or "downloaded.pdf"
-        
-        else:
-            safe_filename = os.path.basename(filepath)
-
-        destination = os.path.join(DOCUMENT_DIR, safe_filename)
-
-        if file_url:
+        if file_url and file_url.startswith(('http://', 'https://')):
             response = requests.get(file_url, stream=True)
             if response.status_code != 200:
                 raise ValueError(f"Failed to download file from URL: {file_url}")
 
             with open(destination, "wb") as f:
-                for chunk in response.iter_content(chunk_size = 8192):
+                for chunk in response.iter_content(chunk_size=8192):
                     f.write(chunk)
-
-            filepath = destination
-
+            source = file_url
+            
         elif filepath:
-            destination = saveFiles(filepath, target_filename = safe_filename)
+            destination = saveFiles(filepath, target_filename=filename)
+            source = filepath
+            
+        else:
+            raise ValueError("Either 'filepath' or 'file_url' must be provided.")
 
+        # Confirm file exists
+        if not os.path.exists(destination):
+            raise FileNotFoundError(f"File not found at: {destination}")
+
+        # Load and embed
         loader = PyPDFLoader(destination)
         documents = loader.load()
 
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size = 1000,
-            chunk_overlap = 200
+            chunk_size=1000,
+            chunk_overlap=200 
         )
         texts = text_splitter.split_documents(documents)
 
         _ = Chroma.from_documents(
-            documents = texts,
-            embedding = EMBEDDING_FUNCTION,
-            collection_name = collection,
-            persist_directory = CHROMA_DB_PERSIST_DIR
+            documents=texts,
+            embedding=EMBEDDING_FUNCTION,
+            collection_name=collection,
+            persist_directory=CHROMA_DB_PERSIST_DIR
         )
 
         return {
             "status": "success",
-            "source": file_url if file_url else filepath,
+            "source": source,
             "destination_filepath": destination,
-            "filename": safe_filename,
+            "filename": filename,
             "collection": collection,
-            "message": f"PDF {safe_filename} has been successfully embedded and stored in collection '{collection}'.",
+            "message": f"PDF '{filename}' has been successfully embedded into collection '{collection}'."
         }
 
     except Exception as err:
         return {
             "status": "error",
-            "message": f"Error embedding PDF: {str(err)}"
+            "message": f"Error embedding PDF: {err}"
         }
     
 def retrieveDocs(query: str, collection: str, top_k: int = 20, use_reranker: bool = True) -> dict:

@@ -15,12 +15,17 @@ def saveFiles(filepath: str, target_filename: str) -> str:
     """
     try:
         filename = target_filename or os.path.basename(filepath)
-        destination = os.path.join(DOCUMENT_DIR, filename)
+        destination = os.path.normpath(os.path.join(DOCUMENT_DIR, filename))
+
         shutil.copy(filepath, destination)
+
+        if not os.path.exists(destination):
+            raise FileNotFoundError(f"File was not saved correctly: {destination}")
+
         return destination
 
     except Exception as err:
-        return f"Error saving file: {str(err)}"
+        raise RuntimeError(f"Error saving file: {err}")
 
 def rerankDocs(query: str, results: list, top_k: int = 5) -> List:
     """
