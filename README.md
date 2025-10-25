@@ -4,16 +4,18 @@
 
 ![Python](https://img.shields.io/badge/Python-3.11.13-yellow?logo=python)
 ![LangChain](https://img.shields.io/badge/LangChain-0.3.27-blue?logo=langchain)
-![Claude Desktop](https://img.shields.io/badge/Claude_Desktop-purple?logo=claude)
+![Claude Desktop](https://img.shields.io/badge/Claude_Desktop-MCP_Client-purple?logo=claude)
+![Cursor IDE](https://img.shields.io/badge/Cursor-MCP_Client-purple)
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_Store-orange?logo=chroma)
 ![HuggingFace](https://img.shields.io/badge/HuggingFace-Embeddings_&_Reranker-gold?logo=huggingface)
 ![GPU](https://img.shields.io/badge/GPU-CUDA-brightgreen?logo=nvidia)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
 ---
 
 > **TL;DR:**
 > - This project implements a **Retrieval-Augmented Generation (RAG)** MCP Server using **LangChain wrappers** for **ChromaDB** and **Hugging Face** models.
-> - Designed for seamless integration with **Claude Desktop** as the MCP client.
+> - Designed for seamless integration with **Claude Desktop** and **Cursor IDE** as the MCP client.
 > - Uses a single persistent **Chroma vector database** with multiple collections (domains).
 > - Automatically retrieves and ranks the most relevant context for Claude, enabling **domain-aware reasoning** and **citation-based responses**.
 
@@ -21,17 +23,19 @@
 
 [![TOC](https://readme-typing-svg.herokuapp.com?font=JetBrainsMono+Nerd+Font&letterSpacing=0.3rem&duration=3000&pause=1000&color=00AEAE&width=450&lines=TABLE+OF+CONTENTS)]()
 
-<!-- - <a href = "TOOLS.md">Available Tools</a> -->
 - <a href = "#project-overview">Project Overview</a>
+  - Workflow
 - <a href = "#features">Features</a>
 - <a href = "#getting-started">Getting Started</a>
     - Prerequisites
     - Installation
-- <a href = "#claude-integration">Claude Integration</a>
-    - Configuration Example
-- <a href = "TOOLS.md">Available Tools</a>
+- <a href = "#integrations">Integrations</a>
+    - Claude Desktop Integration
+    - Cursor IDE Integration
+- <a href = "#tools">Available Tools</a>
 - <a href = "#project-structure">Project Structure</a>
 - <a href = "#references">References</a>
+- <a href = "#license">License</a>
 
 <!-- <div align = "center">
 
@@ -67,18 +71,16 @@
 
 [![PROJECT OVERVIEW](https://readme-typing-svg.herokuapp.com?font=JetBrainsMono+Nerd+Font&letterSpacing=0.3rem&duration=3000&pause=1000&color=00AEAE&width=450&lines=PROJECT+OVERVIEW)]()
 
-This project implements a **LangChain-powered Retrieval-Augmented Generation (RAG)** pipeline hosted as a **FastMCP server** for integration with Claude Desktop.
+This project implements a **LangChain-powered Retrieval-Augmented Generation (RAG)** pipeline hosted as a **FastMCP server** for integration with Claude Desktop and Cursor IDE.
 
 It uses:
 - **`langchain_chroma.Chroma`** for persistent, domain-based vector stores.
 - **`langchain_huggingface.HuggingFaceEmbeddings`** for local or HuggingFace embedding models.
 - **`langchain_community.cross_encoders.HuggingFaceCrossEncoder`** for local or HuggingFace reranking models for better relevance tracking.
-- **FastMCP** for exposing these retrieval and document management tools to Claude Desktop.
+- **`FastMCP`** — a lightweight Python interface (built on FastAPI) that exposes LangChain-based retrieval tools to any MCP client such as Claude Desktop or Cursor IDE.
 
 Each Chroma collection represents a distinct knowledge domain or document.
 Claude queries are routed to the appropriate collection, which retrieves top-k results and returns relevant context and citations.
-
-This project implements a **LangChain-powered Retrieval-Augmented Generation (RAG)** pipeline hosted as a **FastMCP server** for Claude Desktop.  
 
 ### **⚡Workflow:**
 
@@ -109,27 +111,27 @@ flowchart TD
 - **Reranking Support:** Uses a HuggingFace **cross-encoder reranker** for better document relevance.
 - **Document Management:** List, rename, and inspect metadata for locally stored documents.
 - **Collection Management:** Create, list, and delete ChromaDB collections dynamically.
-- **Citation Provider:** Automatically append citations for generated answers.
+- **Citation Provider:** Citations are generated from document metadata (e.g., page numbers, source document and path, etc.).
 - **Self-Describing Tools:** `describeTools()` lists all available MCP tools dynamically for introspection.
 
 <div align="right">
   <a href="#top"><kbd> <br> 🡅 Back to Top <br> </kbd></a>
 </div>
 
-<!-- ---
+---
 
 <a id = "tools"></a>
 
 [![AVAILABLE TOOLS](https://readme-typing-svg.herokuapp.com?font=JetBrainsMono+Nerd+Font&letterSpacing=0.3rem&duration=3000&pause=1000&color=00AEAE&width=450&lines=AVAILABLE+TOOLS)]()
 
-This MCP server exposes a set of tools that can be invoked by Claude Desktop to perform document and collection operations — including embedding, retrieval, metadata management, and citation generation.
+This MCP server exposes a set of tools that can be invoked by MCP Client to perform document and collection operations — including embedding, retrieval, metadata management, and citation generation.
 
 For a full list of available tools, their arguments, and example usage, see the dedicated documentation:  
 [**View All Tools → TOOLS.md**](TOOLS.md)
 
 <div align="right">
   <a href="#top"><kbd> <br> 🡅 Back to Top <br> </kbd></a>
-</div> -->
+</div>
 
 ---
 
@@ -178,7 +180,8 @@ RERANKER_MODEL = "C:/Users/<yourusername>/Projects/RAG-MCP-Server/Models/MiniLM-
 > You need to mention the absolute path wherever needed.
 
 > [!TIP]
-> You can swap the embedding or reranker paths for any HuggingFace models.
+> - The above mentioned configuration uses local downloaded models. You can download the models using the [Download Model.py](Download%20Model.py) python script. Change the models, if needed.
+> - You can swap the embedding or reranker paths for any HuggingFace models.
 
 <div align="right">
   <a href="#top"><kbd> <br> 🡅 Back to Top <br> </kbd></a>
@@ -186,20 +189,25 @@ RERANKER_MODEL = "C:/Users/<yourusername>/Projects/RAG-MCP-Server/Models/MiniLM-
 
 ---
 
-<a id = "claude-integration"></a>
+<a id = "integrations"></a>
 
-[![CLAUDE INTEGRATION](https://readme-typing-svg.herokuapp.com?font=JetBrainsMono+Nerd+Font&letterSpacing=0.3rem&duration=3000&pause=1000&color=00AEAE&width=450&lines=CLAUDE+INTEGRATION)]()
+[![INTEGRATIONS](https://readme-typing-svg.herokuapp.com?font=JetBrainsMono+Nerd+Font&letterSpacing=0.3rem&duration=3000&pause=1000&color=00AEAE&width=450&lines=INTEGRATIONS)]()
 
 > [!IMPORTANT]
-> You need to download the Claude Desktop app in order to run the MCP Server as it needs a MCP Client.
-> You can download the client, [here](https://claude.com/download)
+> You need to download the **Claude Desktop** app or **Cursor IDE** in order to run the MCP Server as it needs a MCP Client.
+> You can download:
+> - [Claude Desktop](https://claude.com/download)
+> - [Cursor IDE](https://cursor.com/download)
 
-Claude Desktop automatically launches the RAG MCP Server when it’s registered in the MCP configuration file.  
+The above mentioned MCP clients automatically launches the RAG MCP Server when it’s registered in the MCP configuration file.  
 You **do not need to run the Python script manually**.
 
-### **🛠️ Configuration Example**
-Add the following entry to your Claude MCP configuration file (typically located in your Claude Desktop settings folder):
+## Claude Desktop Integration
 
+### **🛠️ Setup Instructions**
+- Add the following entry to your Claude MCP configuration file (typically located in your Claude Desktop settings folder).
+- You can find the **mcp configuration file** here: **Settings → Developer → Edit Config** to open the file.
+- Then, add the following JSON config:
 ```json
 {
   "mcpServers": {
@@ -220,6 +228,24 @@ Add the following entry to your Claude MCP configuration file (typically located
 > - `Main.py` has no syntax errors and dependencies are installed.
 > - The `cwd` option matches your project root directory.
 
+## Cursor IDE Integration
+
+### **🛠️ Setup Instructions**
+- Open your project in Cursor IDE and go to **File → Preferences → Cursor Setting → Tool & MCP → New MCP Server** to open your MCP configuration file.
+- Add the following JSON entry under the "mcpServers" section (adjusting paths as needed):
+```json
+{
+  "mcpServers": {
+    "RAG": {
+      "command": "C:/Users/<yourusername>/anaconda3/envs/MCP/python.exe",
+      "args": ["<absolute to the Main.py>"],
+      "options": {
+        "cwd": "absolute project root directory path"
+      }
+    }
+  }
+}
+```
 
 <div align="right">
   <a href="#top"><kbd> <br> 🡅 Back to Top <br> </kbd></a>
@@ -269,3 +295,39 @@ Add the following entry to your Claude MCP configuration file (typically located
 4. Anthropic MCP & Claude Desktop <br>
 [Model Context Protocol Official Site](https://modelcontextprotocol.io/) <br>
 [Claude Desktop Overview](https://www.anthropic.com/claude)
+
+<div align="right">
+  <a href="#top"><kbd> <br> 🡅 Back to Top <br> </kbd></a>
+</div>
+
+---
+
+<a id = "license"></a>
+
+[![LICENSE](https://readme-typing-svg.herokuapp.com?font=JetBrainsMono+Nerd+Font&letterSpacing=0.3rem&duration=3000&pause=1000&color=00AEAE&width=450&lines=LICENSE)](https://git.io/typing-svg)
+
+MIT License
+
+Copyright (c) 2025 Neelotpal Santra
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+<div align="right">
+  <a href="#top"><kbd> <br> 🡅 Back to Top <br> </kbd></a>
+</div>
