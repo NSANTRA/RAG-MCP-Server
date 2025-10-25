@@ -84,13 +84,13 @@ def embedPDF(filepath: str = None, file_url: str = None, filename: str = None, c
         destination = os.path.normpath(os.path.join(DOCUMENT_DIR, filename))
         source = None
         
-        if file_url and file_url.startswith(('http://', 'https://')):
-            response = requests.get(file_url, stream=True)
+        if file_url and file_url.startswith(("http://", "https://")):
+            response = requests.get(file_url, stream = True)
             if response.status_code != 200:
                 raise ValueError(f"Failed to download file from URL: {file_url}")
 
             with open(destination, "wb") as f:
-                for chunk in response.iter_content(chunk_size=8192):
+                for chunk in response.iter_content(chunk_size = 8192):
                     f.write(chunk)
             source = file_url
             
@@ -101,25 +101,23 @@ def embedPDF(filepath: str = None, file_url: str = None, filename: str = None, c
         else:
             raise ValueError("Either 'filepath' or 'file_url' must be provided.")
 
-        # Confirm file exists
         if not os.path.exists(destination):
             raise FileNotFoundError(f"File not found at: {destination}")
 
-        # Load and embed
         loader = PyPDFLoader(destination)
         documents = loader.load()
 
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200 
+            chunk_size = 1000,
+            chunk_overlap = 200 
         )
         texts = text_splitter.split_documents(documents)
 
         _ = Chroma.from_documents(
-            documents=texts,
-            embedding=EMBEDDING_FUNCTION,
-            collection_name=collection,
-            persist_directory=CHROMA_DB_PERSIST_DIR
+            documents = texts,
+            embedding = EMBEDDING_FUNCTION,
+            collection_name = collection,
+            persist_directory = CHROMA_DB_PERSIST_DIR
         )
 
         return {
