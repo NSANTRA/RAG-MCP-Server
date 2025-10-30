@@ -291,7 +291,7 @@ npx @modelcontextprotocol/inspector python Main.py
 > [!TIP]
 > (If using a Conda environment, replace python with its full path. Or, first activate the environment, and use the above command as it is.)
 
-3. The Inspector will open a local web interface (usually at http://localhost:5173
+3. The Inspector will open a local web interface (usually at http://localhost:6274
 ) showing:
     - Input/output schemas
     - Real-time logs and response traces
