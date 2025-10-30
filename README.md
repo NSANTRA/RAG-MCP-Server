@@ -266,12 +266,12 @@ You **do not need to run the Python script manually**.
 > - During installation, **enable “Add to PATH.”**
 > - Verify your installation with `node -v`, `npm -v` and `npx -v`.
 
-## What It Does
+### **What It Does**
 - Lets you call tools interactively and see raw JSON input/output.
 - Displays system logs, server metadata, and protocol messages.
 - Ideal for testing new tool definitions or debugging retrieval workflows.
 
-## Installation
+### **Installation**
 You can install MCP Inspector globally using npm:
 ```bash
 npm install -g @modelcontextprotocol/inspector
@@ -282,7 +282,7 @@ Or run directly with npx (no install needed):
 npx @modelcontextprotocol/inspector
 ```
 
-## Usage
+### **Usage**
 1. Navigate to your project root directory where Main.py is located.
 2. Launch your MCP server via the Inspector:
 ```bash
