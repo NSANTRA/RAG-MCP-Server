@@ -32,6 +32,7 @@
 - <a href = "#integrations">Integrations</a>
     - Claude Desktop Integration
     - Cursor IDE Integration
+- <a href = "#mcp-inspector">MCP Inspector</a>
 - <a href = "#tools">Available Tools</a>
 - <a href = "#project-structure">Project Structure</a>
 - <a href = "#references">References</a>
@@ -253,9 +254,57 @@ You **do not need to run the Python script manually**.
 
 ---
 
+<a id = "mcp-inspector"></a>
+
+[![MCP INSPECTOR](https://readme-typing-svg.herokuapp.com?font=JetBrainsMono+Nerd+Font&letterSpacing=0.3rem&duration=3000&pause=1000&color=00AEAE&width=450&lines=MCP+INSPECTOR)]()
+
+> [!TIP]
+> MCP Inspector is an official developer tool from Anthropic that lets you test, debug, and inspect any Model Context Protocol (MCP) server — including custom RAG MCP servers — without requiring Claude Desktop or Cursor IDE.
+
+> [!IMPORTANT]
+> - To use **MCP Inspector**, you must have [Node.js](https://nodejs.org) installed.  
+> - During installation, **enable “Add to PATH.”**
+> - Verify your installation with `node -v`, `npm -v` and `npx -v`.
+
+## What It Does
+- Lets you call tools interactively and see raw JSON input/output.
+- Displays system logs, server metadata, and protocol messages.
+- Ideal for testing new tool definitions or debugging retrieval workflows.
+
+## Installation
+You can install MCP Inspector globally using npm:
+```bash
+npm install -g @modelcontextprotocol/inspector
+```
+
+Or run directly with npx (no install needed):
+```bash
+npx @modelcontextprotocol/inspector
+```
+
+## Usage
+1. Navigate to your project root directory where Main.py is located.
+2. Launch your MCP server via the Inspector:
+```bash
+npx @modelcontextprotocol/inspector python Main.py
+```
+> [!TIP]
+> (If using a Conda environment, replace python with its full path. Or, first activate the environment, and use the above command as it is.)
+
+3. The Inspector will open a local web interface (usually at http://localhost:5173
+) showing:
+    - Input/output schemas
+    - Real-time logs and response traces
+
+<div align="right">
+  <a href="#top"><kbd> <br> 🡅 Back to Top <br> </kbd></a>
+</div>
+
+---
+
 <a id = "project-structure"></a>
 
-[![PROJECT STRUCTURE](https://readme-typing-svg.herokuapp.com?font=JetBrainsMono+Nerd+Font&letterSpacing=0.3rem&duration=3000&pause=1000&color=00AEAE&width=450&lines=PROJECT+STRUCTURE)](https://git.io/typing-svg)
+[![PROJECT STRUCTURE](https://readme-typing-svg.herokuapp.com?font=JetBrainsMono+Nerd+Font&letterSpacing=0.3rem&duration=3000&pause=1000&color=00AEAE&width=450&lines=PROJECT+STRUCTURE)]()
 
 ```tree
 ├── Main.py                 # Entry point - starts the FastMCP server
@@ -280,7 +329,7 @@ You **do not need to run the Python script manually**.
 
 <a id = "references"></a>
 
-[![REFERENCES](https://readme-typing-svg.herokuapp.com?font=JetBrainsMono+Nerd+Font&letterSpacing=0.3rem&duration=3000&pause=1000&color=00AEAE&width=450&lines=REFERENCES)](https://git.io/typing-svg)
+[![REFERENCES](https://readme-typing-svg.herokuapp.com?font=JetBrainsMono+Nerd+Font&letterSpacing=0.3rem&duration=3000&pause=1000&color=00AEAE&width=450&lines=REFERENCES)]()
 
 1. LangChain RAG Workflow <br>
 [LangChain Documentation — RAG](https://python.langchain.com/docs/use_cases/question_answering/)
@@ -304,7 +353,7 @@ You **do not need to run the Python script manually**.
 
 <a id = "license"></a>
 
-[![LICENSE](https://readme-typing-svg.herokuapp.com?font=JetBrainsMono+Nerd+Font&letterSpacing=0.3rem&duration=3000&pause=1000&color=00AEAE&width=450&lines=LICENSE)](https://git.io/typing-svg)
+[![LICENSE](https://readme-typing-svg.herokuapp.com?font=JetBrainsMono+Nerd+Font&letterSpacing=0.3rem&duration=3000&pause=1000&color=00AEAE&width=450&lines=LICENSE)]()
 
 MIT License
 
